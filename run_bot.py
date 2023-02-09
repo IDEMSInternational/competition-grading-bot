@@ -5,6 +5,8 @@ import os
 from dotenv import load_dotenv
 from telethon.tl.types import ChannelParticipantsAdmins
 
+from sdaps_tools import parse_image
+
 
 # from get_channel_ids import start_bot
 import logging
@@ -81,25 +83,32 @@ async def my_event_handler(event):
             await event.reply("Please send me a photo of the student's answer sheet.")
         elif state == "prompt_photo":
             msg = "Please verify the information below.\n"
-            # TODO: Process the photo. Below is some fake data
-            # if not (row['recognized'] and row['valid']):
-            #     print("Unable to recognize sheet.")
-            #     continue
-            # for i in range(1,16):
-            #     answer = answer_id_map.get(int(row[f"1_1_{i}"]), "Unknown")
-            #     s += f"Q{i}: {answer}\n"
             msg += f"Student name: {data['name']}\n"
+            answers = None
             if "answers" in data:
                 answers = data["answers"]
+            elif event.message.file:
+                await event.message.download_media(file=event.message.file.name)
+                try:
+                    row = parse_image(event.message.file.name, "answer_sheet")
+                except:
+                    row = None
+                print(row)
+                if not row or not (row['recognized'] and row['valid']):
+                    await event.reply("Unable to recognize sheet. Please try again.")
+                else:
+                    answers = [int(row[f"1_1_{i}"]) for i in range(1,16)]
             else:
-                answers = [1,2,5,-2,3,-1,4,7]
-            for i, ans in enumerate(answers):
-                answer = answer_id_map.get(ans, "Unknown")
-                msg += f"Q{i+1}: {answer}\n"
-            msg += "Type YES to confirm correctness, NO to change an answer."
-            state = "prompt_verify"
-            data["answers"] = answers
-            await event.reply(msg)
+                await event.reply("Please attach an image of the student's answer sheet.")
+                # answers = [1,2,5,-2,3,-1,4,7]
+            if answers:
+                for i, ans in enumerate(answers):
+                    answer = answer_id_map.get(ans, "Unknown")
+                    msg += f"Q{i+1}: {answer}\n"
+                msg += "Type YES to confirm correctness, NO to change an answer."
+                state = "prompt_verify"
+                data["answers"] = answers
+                await event.reply(msg)
         elif state == "prompt_verify":
             if text.strip().lower() == 'yes':
                 print(data)
@@ -139,6 +148,6 @@ async def my_event_handler(event):
     state_data = {'state' : state, 'data' : data}
     write_user_state(sender_id, state_data)
 
-
+os.makedirs(STATE_FOLDER, exist_ok=True)
 client.start(bot_token=bot_token)
 client.run_until_disconnected()

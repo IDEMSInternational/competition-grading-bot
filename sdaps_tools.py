@@ -48,9 +48,8 @@ def parse_image(image, project_id):
     # TODO: get the actual output and print it (student answers and other info).
     csv_path = os.path.join(folder_path, 'data_1.csv')
     with open(csv_path, 'r') as file:
-        if project_id == "answer_sheet":
-            reader = csv.DictReader(file)
-            row = next(reader)
+        reader = csv.DictReader(file)
+        row = next(reader)
     os.remove(csv_path)
     os.remove(os.path.join(folder_path, '1.tif'))
     return row
