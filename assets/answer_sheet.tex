@@ -1,0 +1,113 @@
+% This example can be compiled using pdflatex if the SDAPS class is installed.
+%
+% To use with SDAPS, a new project has to be created. You can do so by running
+%   $ sdaps setup tex /tmp/example-project example.tex --add coins
+% or without installation by running
+%   $ ../sdaps.py setup tex /tmp/example-project example.tex --add coins
+% from the directory containing this file and the coins subdirectory.
+
+\documentclass[
+  % Babel language, also used to load translations
+  english,
+  % Use A4 paper size, you can change this to eg. letterpaper if you need
+  % the letter format. The normal methods to modify the paper size should
+  % be picked up by SDAPS automatically.
+  % a4paper, % setting this might break the example scan unfortunately
+  % letterpaper
+  %
+  % If you need it, you can add a custom barcode at the center
+  %globalid=SDAPS,
+  %
+  % And the following adds a per sheet barcode at the bottom left
+  %print_questionnaire_id,
+  %
+  % You can choose between twoside and oneside. twoside is the default, and
+  % requires the document to be printed and scanned in duplex mode.
+  %oneside,
+  %
+  % With SDAPS 1.1.6 and newer you can choose the mode used when recognizing
+  % checkboxes. valid modes are "checkcorrect" (default), "check" and
+  % "fill".
+  %checkmode=checkcorrect,
+  ]{sdapsclassic}
+\usepackage[utf8]{inputenc}
+% For demonstration purposes
+\usepackage{multicol}
+\usepackage{graphicx}
+\graphicspath{{coins/}}
+
+% Load and enable PDF form support; note that \begin{Form}/\end{Form} is needed
+\usepackage{sdapspdf}
+\ExplSyntaxOn
+\sdaps_context_append:nn{*}{pdf_form=true}
+\ExplSyntaxOff
+
+\author{The Author}
+\title{[Contest name goes here]}
+
+\begin{document}
+  % Everything you do should be done inside the questionnaire environment.
+
+  % If you don't like the default text at the beginning of each questionnaire
+  % you can remove it with the optional [noinfo] parameter for the environment 
+  \begin{questionnaire}[noinfo]
+  \begin{Form}
+    % There is a predefined "info" style to hilight some text.
+    \begin{info}
+      % You can create a customized information element similar to the standard
+      % one using the \texttt{info} environment. By adding \texttt{[noinfo]} to
+      % the \texttt{questionaire} environment you can replace the predefined
+      % information field with your own.
+      For each question, select at most answer. Select an answer by checking
+      the corresponding box, like this: \checkedbox*{}. If you made a wrong
+      choice, you can uncheck a box like this: \correctedbox*{}.
+      Probably some better instructions should go here.
+      % You can draw \checkedbox{} crossed
+      % checkboxes, \filledbox{} filled or \correctedbox{} filled and crossed ones. Finally there is
+      % also the plain \checkbox{} checkbox using {\ttfamily \textbackslash{}checkbox}
+      % or the starred versions showing single choice items \checkbox*{}
+      % \checkedbox*{}.
+    \end{info}
+
+    % Use \addinfo to add metadata (which is printed on the report later on)
+    \addinfo{Date}{10.03.2023}
+
+    \section{Questions}
+
+    \begin{info}
+      For each question for your problem sheet, select the appropriate answer.
+    \end{info}
+
+    % And a more compact way of doing it; similar to markgroup
+    \begin{center}
+    \begin{choicegroup}[singlechoice,align=center]{Choose:}
+      % We have to add the possible choices at the start.
+      \groupaddchoice{A}
+      \groupaddchoice{B}
+      \groupaddchoice{C}
+      \groupaddchoice{D}
+      \groupaddchoice{E}
+
+      % After that it is possible to add each question.
+      \choiceline{Question 1}
+      \choiceline{Question 2}
+      \choiceline{Question 3}
+      \choiceline{Question 4}
+      \choiceline{Question 5}
+      \choiceline{Question 6}
+      \choiceline{Question 7}
+      \choiceline{Question 8}
+      \choiceline{Question 9}
+      \choiceline{Question 10}
+      \choiceline{Question 11}
+      \choiceline{Question 12}
+      \choiceline{Question 13}
+      \choiceline{Question 14}
+      \choiceline{Question 15}
+    \end{choicegroup}
+  \end{center}
+
+  \end{Form}
+  \end{questionnaire}
+\end{document}
+
